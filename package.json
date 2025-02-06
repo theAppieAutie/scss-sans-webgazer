@@ -27,6 +27,7 @@
     "jest": "^29.7.0",
     "nodemon": "^3.1.4"
   },
+"engines": {  "node": ">=18.0.0",  "npm": ">=11.1.0"},
   "description": "📡 SCSS (Security Control Simulation System) 📄 About",
   "keywords": [],
   "author": "",
