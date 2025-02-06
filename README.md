@@ -14,8 +14,6 @@ The system utilizes a Battlespace Management Task (Hodgetts et al., 2015), adapt
 Advisor Panel:
 Participants in advisory conditions receive advice on how to classify each data point via an additional panel, depending on their assigned advisor (AI, computer, or human).
 
-Eye Tracking:
-Participants' eye movements will be recorded to monitor gaze patterns and fixation points during decision-making. This provides insights into how frequently and for how long they refer to the advisor's recommendations.
 🎯 Aim
 
 The objective of this experiment is to evaluate how people respond to advice from AI, computer, or human advisors and the impact of this advice on classification accuracy.
@@ -27,11 +25,6 @@ The objective of this experiment is to evaluate how people respond to advice fro
     Radar Display:
     A visual representation of incoming network traffic for classification.
 
-    Eye Tracking Integration:
-    Analyzes participants' gaze patterns during decision-making tasks.
-
-    This project utilises webgazer.js, an open-source eye-tracking library developed by the Brown HCI group, for implementing eye-tracking functionality.
-    https://github.com/brownhci/WebGazer 
 
 🛠️ Prerequisites
 
@@ -42,7 +35,7 @@ The objective of this experiment is to evaluate how people respond to advice fro
 🚀 Installing
 
     🖥️ Clone the repository:
-    git clone https://github.com/theAppieAutie/SCSSxWebGazer.git
+    git clone https://github.com/theAppieAutie/scss-sans-webgazer.git
 
     📁 Navigate to the project folder:
     cd SCSSxWebGazer
