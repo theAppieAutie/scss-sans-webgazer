@@ -269,11 +269,9 @@ const handleInput = async (data) => {
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
+    } else {
+      window.location.href = "/information/rules";
     }
-
-    const result = await response.json();
-    console.log('Regular data response:', result);
-
 
   } catch (err) {
     console.error('Error:', err);

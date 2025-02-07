@@ -46,6 +46,7 @@ exports.stopTrial = async (req, res, next) => {
             input['time'] = input['time'] ? input['time'] : new Date().toISOString();
             await req.dbServices.insertPacket(trialId, input.user, input.advisor, input.accepted, input.time);
         }
+        
         res.status(200).json({ message: 'Regular data received successfully' });
 
     } catch (err) {
