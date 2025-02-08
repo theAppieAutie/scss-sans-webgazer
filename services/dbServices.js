@@ -57,11 +57,15 @@ const insertParticipant = async (username, condition, groupName, censoredInfo, g
 };
 
 const getNextId = async () => {
+    console.log("attempting connection")
     const client = await pool.connect();
     try {
+        console.log("connected")
         const query = 'SELECT MAX(participant_id) AS max_id FROM participants;'
         const result = await client.query(query);
+        console.log("query sent and result returned")
         const maxId = result.rows[0].max_id;
+        console.log(`maxId is equal to ${maxId !== null ? maxId : 1} because maxId is real : ${maxId !== null}`)
         return maxId !== null ? Number(maxId) + 1 : 1;
     } finally {
         client.release();
