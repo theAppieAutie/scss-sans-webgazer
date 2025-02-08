@@ -1,6 +1,7 @@
 // imports
 
 const {Pool} = require('pg');
+const { connect_timeout, idleTimeoutMillis } = require('pg/lib/defaults');
 
 // Set up connection to DB and CRUD ops
 
@@ -34,7 +35,9 @@ async () => {
     connectionString: process.env.SUPABASE_DB_URL,
      ssl:{
          rejectUnauthorized: false
-     }
+     },
+     connect_timeout: 5,
+     idleTimeoutMillis: 30000
  });
   
 pool.connect()
