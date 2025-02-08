@@ -38,14 +38,6 @@ app.use(express.json())
 app.use(flash());
 app.use(methodOverride('_method'));
 
-// services middleware
-app.use((req, res, next) => {
-    req.dbServices = dbServices;
-    next();
-});
-
-
-
 
 // Session Configuration
 app.use(
@@ -55,6 +47,17 @@ app.use(
       saveUninitialized: false
     })
 );
+
+// services middleware
+app.use((req, res, next) => {
+    req.dbServices = dbServices;
+    next();
+});
+
+
+
+
+
 
 // routes
 app.use('/participant', participantDetailsRoutes);
