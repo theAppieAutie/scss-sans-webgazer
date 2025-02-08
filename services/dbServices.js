@@ -22,7 +22,7 @@ async () => {
     try {
         const query = "SELECT MAX(trial_id) AS max_id FROM trials;"
         const result = await client.query(query);
-        const maxId = result.rows[0].max_id;
+        const maxId = result.rows[0].max_id ? result.rows[0].max_id : 1;
         return maxId;
     } finally {
         client.release();
