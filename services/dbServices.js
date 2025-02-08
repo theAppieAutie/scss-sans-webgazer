@@ -34,8 +34,7 @@ async () => {
     connectionString: process.env.SUPABASE_DB_URL,
      ssl:{
          rejectUnauthorized: false
-     },
-     family: 4, // Force IPv4
+     }
  });
   
 pool.connect()
