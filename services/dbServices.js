@@ -42,8 +42,7 @@ dns.setDefaultResultOrder('ipv4first');
          rejectUnauthorized: false
      },
      connect_timeout: 5,
-     idleTimeoutMillis: 30000,
-     family
+     idleTimeoutMillis: 30000
  });
   
 pool.connect()
