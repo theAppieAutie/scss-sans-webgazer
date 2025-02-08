@@ -31,13 +31,19 @@ async () => {
 
 }
 
+const dns = require('dns');
+
+// Force Node.js to prioritize IPv4 over IPv6
+dns.setDefaultResultOrder('ipv4first');
+
  const pool = new Pool({
     connectionString: process.env.SUPABASE_DB_URL,
      ssl:{
          rejectUnauthorized: false
      },
      connect_timeout: 5,
-     idleTimeoutMillis: 30000
+     idleTimeoutMillis: 30000,
+     family
  });
   
 pool.connect()
