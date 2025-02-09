@@ -107,18 +107,7 @@ const insertPacket = async (trial, user, advisor, accepted, time) => {
     }
 };
 
-const insertGazeData = async(trial, x, y, elapsedTime) => {
-    const client = await pool.connect();
-    try {
-        const query = 'INSERT INTO gaze_data (trial_id, x, y, elapsed_time) VALUES ($1, $2, $3, $4);';
-        const values = [trial, x, y, elapsedTime];
-        const result = await client.query(query, values);
-    } catch (err) {
-        console.error("error inserting gaze data" , err.stack);
-    } finally {
-        client.release();
-    }
-}
+
 
 const insertScale = async (participant, type, phase) => {
    
@@ -170,8 +159,6 @@ const dbServices = {
     insertParticipant,
 
     getNextId,
-
-    insertGazeData,
 
     getLastTrialId
 
