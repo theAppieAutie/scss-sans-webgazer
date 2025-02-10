@@ -32,11 +32,23 @@ app.set("view engine", "ejs");
 app.use("/public", express.static(path.join(__dirname, "/public")));
 app.use(express.static(path.join(__dirname, "/public")));
 
+// Session Configuration
+app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false
+    })
+);
+
 // middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 app.use(flash());
 app.use(methodOverride('_method'));
+
+
+
 
 // services middleware
 app.use((req, res, next) => {
@@ -47,14 +59,7 @@ app.use((req, res, next) => {
 
 
 
-// Session Configuration
-app.use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false
-    })
-);
+
 
 // routes
 app.use('/participant', participantDetailsRoutes);

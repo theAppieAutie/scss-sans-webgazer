@@ -1,17 +1,18 @@
-vsvsor do you fork // imports
+// imports
 
 const {Pool} = require('pg');
+const { connect_timeout, idleTimeoutMillis } = require('pg/lib/defaults');
 
 // Set up connection to DB and CRUD ops
 
 // local development uncomment below
-//const pool = new Pool({
-//    user: process.env.DB_USER,
-//    host: process.env.DB_HOST,
-//    database: process.env.DB_DATABASE,
-//    password: process.env.DB_PASSWORD,
-//    port: process.env.DB_PORT,
-//  });
+// const pool = new Pool({
+//     user: process.env.DB_USER,
+//     host: process.env.DB_HOST,
+//     database: process.env.DB_DATABASE,
+//     password: process.env.DB_PASSWORD,
+//     port: process.env.DB_PORT,
+//   });
 
 
 //   hosted on heroku for my hosted version only
@@ -22,7 +23,7 @@ async () => {
     try {
         const query = "SELECT MAX(trial_id) AS max_id FROM trials;"
         const result = await client.query(query);
-        const maxId = result.rows[0].max_id;
+        const maxId = result.rows[0].max_id ? result.rows[0].max_id : 1;
         return maxId;
     } finally {
         client.release();
@@ -30,12 +31,19 @@ async () => {
 
 }
 
-  const pool = new Pool({
-     connectionString: process.env.SUPABASE_DB_URL,
-      ssl:{
-          rejectUnauthorized: false
-      }
-  });
+const dns = require('dns');
+
+// Force Node.js to prioritize IPv4 over IPv6
+dns.setDefaultResultOrder('ipv4first');
+
+ const pool = new Pool({
+    connectionString: process.env.SUPABASE_DB_URL,
+     ssl:{
+         rejectUnauthorized: false
+     },
+     connect_timeout: 5,
+     idleTimeoutMillis: 30000
+ });
   
 pool.connect()
     .then(() => console.log('Connected to PostgreSQL'))
@@ -57,11 +65,15 @@ const insertParticipant = async (username, condition, groupName, censoredInfo, g
 };
 
 const getNextId = async () => {
+    console.log("attempting connection")
     const client = await pool.connect();
     try {
+        console.log("connected")
         const query = 'SELECT MAX(participant_id) AS max_id FROM participants;'
         const result = await client.query(query);
+        console.log("query sent and result returned")
         const maxId = result.rows[0].max_id;
+        console.log(`maxId is equal to ${maxId !== null ? maxId : 1} because maxId is real : ${maxId !== null}`)
         return maxId !== null ? Number(maxId) + 1 : 1;
     } finally {
         client.release();
@@ -95,18 +107,7 @@ const insertPacket = async (trial, user, advisor, accepted, time) => {
     }
 };
 
-const insertGazeData = async(trial, x, y, elapsedTime) => {
-    const client = await pool.connect();
-    try {
-        const query = 'INSERT INTO gaze_data (trial_id, x, y, elapsed_time) VALUES ($1, $2, $3, $4);';
-        const values = [trial, x, y, elapsedTime];
-        const result = await client.query(query, values);
-    } catch (err) {
-        console.error("error inserting gaze data" , err.stack);
-    } finally {
-        client.release();
-    }
-}
+
 
 const insertScale = async (participant, type, phase) => {
    
@@ -158,8 +159,6 @@ const dbServices = {
     insertParticipant,
 
     getNextId,
-
-    insertGazeData,
 
     getLastTrialId
 
