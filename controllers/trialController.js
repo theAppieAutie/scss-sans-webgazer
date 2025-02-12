@@ -21,10 +21,10 @@ exports.startTrial = async (req, res, next) => {
             conditionText = ""; 
             break;
         case "aiAdvisor":
-            conditionText = "This is the recommendation of an A.I Expert";
+            conditionText = "This is the recommendation of a 66% accurate A.I Expert";
             break;
         case "humanAdvisor":
-            conditionText = "This is the recommendation of a human expert";
+            conditionText = "This is the recommendation of a 66% accurate human expert";
             break;
         default:
             conditionText = ''; // Default to no text
