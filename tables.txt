@@ -34,10 +34,11 @@
  items      | scale_id    | integer FOREIGN KEY -> scales
  items      | item_value  | integer
 
- gaze_data  | id          | integer
- gaze_data  | trial_id    | integer FOREIGN KEY -> trials 
- gaze_data  | x           | float
- gaze_data  | y           | float
- gaze_data  | elapsed_time| integer
+ cursor_data  | id          | integer
+ cursor_data  | trial_id    | integer FOREIGN KEY -> trials 
+ cursor_data  | x           | integer
+ cursor_data  | y           | integer
+ cursor_data  | time        | numeric
+ cursor_data  | event       | character varying
 
 
