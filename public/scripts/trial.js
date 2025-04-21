@@ -1,6 +1,8 @@
 import { initializeClassificationButtons, confirmClassification } from './classification.js';
 import {config} from "./config.js";
 
+
+
 //  object holding censored item list to add blur
 const censoredOptions = {
   'RIO' : {
@@ -15,6 +17,8 @@ const censoredOptions = {
     3 : 'info-country'
   }
 }
+
+
 
 // Function to change game styles based on the group
 const adjustGameStyles = () => {
@@ -65,7 +69,7 @@ let selectedDotInfo = null;
 let dotElement = null;
 const timeForTrial = config.trialLength * 60000;
 const timePerPacket = (config.packetTimeOnScreen * 1000) * packetArray.length <= timeForTrial ? config.packetTimeOnScreen : (timeForTrial / packetArray.length) / 1000; 
-
+console.log(timePerPacket + "*************************************")
 // set up trial view
 if (group !== "A") {
   panelsElement.style.flexDirection = "row-reverse";
@@ -93,9 +97,18 @@ if (conditionText === "No Advisor") {
 initializeClassificationButtons();
 
 // Attach confirmation event
-document.getElementById("trusted").addEventListener("click", () => confirmClassification(dotElement, selectedDotInfo, "trusted"));
-document.getElementById("suspect").addEventListener("click", () => confirmClassification(dotElement, selectedDotInfo, "suspect"));
-document.getElementById("hostile").addEventListener("click", () => confirmClassification(dotElement, selectedDotInfo, "hostile"));
+document.getElementById("trusted").addEventListener("click", () => {
+  mouseview.logEvent("trusted button click")
+  confirmClassification(dotElement, selectedDotInfo, "trusted");
+})
+document.getElementById("suspect").addEventListener("click", () => {
+  mouseview.logEvent("suspect button click")
+  confirmClassification(dotElement, selectedDotInfo, "suspect")
+});
+document.getElementById("hostile").addEventListener("click", () => {
+  mouseview.logEvent("hostile button click")
+  confirmClassification(dotElement, selectedDotInfo, "hostile")
+});
 
 let selectedDot = null;
 
@@ -156,6 +169,7 @@ for (let packet of packetArray) {
     selectedDotInfo = packet;
     dotElement = this;
     document.getElementById("accept").addEventListener("click", function() {
+      mouseview.logEvent("accept button click")
       packet["acceptedRecommendation"] = true;
       confirmClassification(dotElement, selectedDotInfo, packet.recommendation);
     });
@@ -256,9 +270,10 @@ const endTrial = () => {
 }
 
 const handleInput = async (data) => {
+  mouseview.stopTracking();
   try {
     const trialEndTime = new Date().toISOString();
-    const response = await fetch('/trial/addTrial', {
+    const result = await fetch('/trial/addTrial', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -267,17 +282,47 @@ const handleInput = async (data) => {
       body: JSON.stringify({ input: data, trialEndTime })
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    } else {
-      window.location.href = "/information/rules";
-    }
+    const response = await handleCursorData();
 
   } catch (err) {
     console.error('Error:', err);
   }
 };
 
+const handleCursorData = async () => {
+  try {
+    const jsonString = JSON.stringify(mouseview.datalogger.data);
+    const utf8Data = new TextEncoder().encode(jsonString);
+    const compressedCursorData = pako.gzip(utf8Data);
+    const b64String = btoa(String.fromCharCode.apply(null, compressedCursorData));
+
+    const response = await fetch('/trial/addCursorData', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body : JSON.stringify({"compressedCursorData": b64String})
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error sending cursor data! Status ${response.status}`)
+    } else {
+      window.location.href = "/information/rules"
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+
+
+
 window.addEventListener('load',() => {
-    startTrial();
+  mouseview.params.apertureSize = config.sizeOfMouseViewWindow;
+  mouseview.params.overlayAlpha = config.mouseViewOverlayAlpha;
+  mouseview.params.apertureGauss = config.deviationInPixelsOfEdgeOfFilter;
+  mouseview.params.overlayGaussian = 0;
+  mouseview.init() 
+  mouseview.startTracking();
+  startTrial();
 });

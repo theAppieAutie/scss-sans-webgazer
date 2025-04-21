@@ -1,3 +1,5 @@
+const pako = require('pako');
+
 exports.startTrial = async (req, res, next) => {
     try {
         if (!req.session.condition) {
@@ -37,6 +39,8 @@ exports.startTrial = async (req, res, next) => {
 
 exports.stopTrial = async (req, res, next) => {
     try {
+
+      
         const trialEndTime = req.body["trialEndTime"];
         const trialType = req.session.trialNumber === 0 ? 'test' : 'main';
         const trialId = await req.dbServices.insertTrial(req.session.participantId, trialType, req.session.trialNumber, req.session.trialStartTime, trialEndTime);
@@ -54,5 +58,58 @@ exports.stopTrial = async (req, res, next) => {
     }
 }
 
+const zlib = require('zlib');
 
+async function gzipDecompression(data) {
+    
+    const gunzip = zlib.createGunzip();
+
+    let buffer = [];
+
+    gunzip.on('data', (chunk) => { 
+        buffer.push(chunk);
+    })
+
+    const decompressPromise = new Promise((resolve, reject) => {
+
+        gunzip.on('end', () => {
+
+            try {
+                const decompressedBuffer = Buffer.concat(buffer); 
+               
+                const jsonData = JSON.parse(decompressedBuffer);
+                resolve(jsonData);
+            } catch (error) {
+                reject(error)
+            }
+        });
+
+        gunzip.on('error', (err) => {
+            console.log(`Decompression Error: ${err}`)
+            reject(err);
+        });
+    });
+
+    gunzip.end(Buffer.from(data, 'base64'));
+    return decompressPromise;
+} 
+
+exports.addCursorData = async (req, res, next) => {
+    
+    try {
+        
+        const decompressedData = await gzipDecompression(req.body.compressedCursorData)
+        console.log(`type of data for decompressedData = ${typeof decompressedData}`);
+        const trialId = await req.dbServices.getLastTrialId();
+
+        for( let cursorData of decompressedData) {
+            await req.dbServices.insertCursorData(cursorData, trialId)
+        }
+
+        res.status(200).json({message: "cursor data stored"});
+    } catch (err) {
+        console.log("Error at the endpoint:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
 
